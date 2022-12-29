@@ -1,0 +1,43 @@
+//@version=4 
+// This is a momentum strategy that buys when the 10-day moving average crosses above the 20-day moving average
+// and sells when the 10-day moving average crosses below the 20-day moving average
+
+// Define variables for the strategy
+strategy("Momentum Strategy", overlay=true)
+// This strategy buys when the close price is above the upper Bollinger Band
+// and sells when the close price is below the lower Bollinger Band
+
+// The strategy uses a simple moving average (SMA) of the close price
+// as the middle Bollinger Band
+
+// The length of the SMA and the standard deviation of the close price
+// used to calculate the Bollinger Bands can be customized
+
+
+// Parameters
+length = input(title="Length of SMA", type=input.integer, defval=9)
+standard_deviation = input(title="Standard Deviation", type=input.float, defval=1.509)
+
+// Calculate the middle Bollinger Band (SMA of close)
+middle_band = sma(close, length)
+
+// Calculate the upper and lower Bollinger Bands
+upper_band = middle_band + standard_deviation * stdev(close, length)
+lower_band = middle_band - standard_deviation * stdev(close, length)
+
+// Plot the Bollinger Bands
+plot(middle_band, title="Middle Band", color=color.green)
+plot(upper_band, title="Upper Band", color=color.red)
+plot(lower_band, title="Lower Band", color=color.red)
+
+// Buy when the close price crosses above the upper Bollinger Band
+if (close > upper_band)
+    strategy.exit("Take Profit/ Stop Loss","Long", stop=lower_band, limit=upper_band)
+    strategy.entry("Long", strategy.long)
+
+// Sell when the close price crosses below the lower Bollinger Band
+if (close < lower_band)
+    strategy.exit("Take Profit/ Stop Loss","Short", stop=upper_band, limit=lower_band)
+    strategy.entry("Short", strategy.short)
+
+
